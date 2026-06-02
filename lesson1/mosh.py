@@ -51,3 +51,5 @@ for index, (company, count) in enumerate(top_5_companies, start=1):
 
 save_json_file("top_5_companies.json", result)
 print("Top 5 companies saved successfully")
+
+print("Git test")
