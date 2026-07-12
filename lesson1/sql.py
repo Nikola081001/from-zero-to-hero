@@ -1,6 +1,5 @@
 import sqlite3
-
-DB_NAME = "school.db"
+from database import DB_NAME
 
 
 def create_table():
