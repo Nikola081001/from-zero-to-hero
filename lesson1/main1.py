@@ -1,18 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from schemas import StudentCreate, StudentUpdateAge
 from sql import get_all_students, get_student_by_id,  students_to_dicts, student_to_dict, add_student, update_student_age, delete_student
 
 
 app = FastAPI()
-
-
-class StudentUpdateAge(BaseModel):
-    new_age: int
-
-
-class StudentCreate(BaseModel):
-    name: str
-    age: int
 
 
 @app.put("/students/{student_id}")
@@ -29,27 +20,6 @@ def update_student(student_id: int, student_update: StudentUpdateAge):
         "student": {
             "id": student_id,
             "age": student_update.new_age
-        }
-    }
-
-
-class StudentDelete(BaseModel):
-    student_id: int
-
-
-@app.delete("/students/{student_id}")
-def delete_student_endpoint(student_id: int, student_delete: StudentDelete):
-    student = get_student_by_id(student_id)
-
-    if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-
-    delete_student(student_id)
-
-    return {
-        "message": "Student deleted successfully",
-        "student": {
-            "id": student_id
         }
     }
 
@@ -90,3 +60,20 @@ def get_student(student_id: int):
         raise HTTPException(status_code=404, detail="Student not found")
 
     return student_to_dict(student)
+
+
+@app.delete("/students/{student_id}")
+def delete_student_endpoint(student_id: int):
+    student = get_student_by_id(student_id)
+
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    delete_student(student_id)
+
+    return {
+        "message": "Student deleted successfully",
+        "student": {
+            "id": student_id
+        }
+    }
