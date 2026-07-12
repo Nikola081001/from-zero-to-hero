@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from schemas import StudentCreate, StudentUpdateAge
-from sql import get_all_students, get_student_by_id,  students_to_dicts, student_to_dict, add_student, update_student_age, delete_student
+from crud import get_all_students, get_student_by_id,  students_to_dicts, student_to_dict, add_student, update_student_age, delete_student
 
 
 app = FastAPI()
