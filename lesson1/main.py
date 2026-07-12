@@ -1,57 +1,79 @@
-import json
+from fastapi import FastAPI, HTTPException
+from schemas import StudentCreate, StudentUpdateAge
+from crud import get_all_students, get_student_by_id,  students_to_dicts, student_to_dict, add_student, update_student_age, delete_student
 
 
-def load_json_file(filename):
-    with open(filename, "r") as file:
-        data = json.load(file)
-    return data
+app = FastAPI()
 
 
-def save_json_file(filename, data):
-    with open(filename, "w") as file:
-        json.dump(data, file, indent=4)
+@app.put("/students/{student_id}")
+def update_student(student_id: int, student_update: StudentUpdateAge):
+    student = get_student_by_id(student_id)
+
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    update_student_age(student_id, student_update.new_age)
+
+    return {
+        "message": "Student age updated successfully",
+        "student": {
+            "id": student_id,
+            "age": student_update.new_age
+        }
+    }
 
 
-def count_by_nested_key(data, outer_key, inner_key):
-    counts = {}
+@app.post("/students", status_code=201)
+def create_student(student: StudentCreate):
+    if not student.name.strip():
+        raise HTTPException(status_code=400, detail="Name cannot be empty")
 
-    for item in data:
-        value = item[outer_key][inner_key]
+    new_student_id = add_student(student.name, student.age)
 
-        if value in counts:
-            counts[value] += 1
-        else:
-            counts[value] = 1
-    return counts
-
-
-def sort_count_dict(counts):
-    sorted_items = sorted(
-        counts.items(), key=lambda item: item[1], reverse=True)
-    return sorted_items
+    return {
+        "message": "Student created successfully",
+        "student": {
+            "id": new_student_id,
+            "name": student.name,
+            "age": student.age
+        }
+    }
 
 
-def get_top_n(sorted_items, n):
-    return sorted_items[:n]
+@app.get("/")
+def home():
+    return {"message": "Student API is running"}
 
 
-users = load_json_file("user_from_api.json")
+@app.get("/students")
+def get_students():
+    students = get_all_students()
+    return students_to_dicts(students)
 
 
-city_counts = count_by_nested_key(users, "address", "city")
-sorted_city_counts = sort_count_dict(city_counts)
-top_3_cities = get_top_n(sorted_city_counts, 3)
+@app.get("/students/{student_id}")
+def get_student(student_id: int):
+    student = get_student_by_id(student_id)
 
-result = []
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
 
-for index, (city, count) in enumerate(top_3_cities, start=1):
-    result.append({
-        "rank": index,
-        "city": city,
-        "count": count
-    })
+    return student_to_dict(student)
 
 
-save_json_file("final_top_3_cities.json", result)
+@app.delete("/students/{student_id}")
+def delete_student_endpoint(student_id: int):
+    student = get_student_by_id(student_id)
 
-print("Final top 3 cities saved successfuly")
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    delete_student(student_id)
+
+    return {
+        "message": "Student deleted successfully",
+        "student": {
+            "id": student_id
+        }
+    }

@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-import sql
+import crud
 
 
 class StudentDatabaseTests(unittest.TestCase):
