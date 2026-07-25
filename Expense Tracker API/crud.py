@@ -92,3 +92,12 @@ def delete_expense(expense_id):
     cursor.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
     connection.commit()
     connection.close()
+
+
+def get_total_expenses():
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    cursor.execute("SELECT SUM(amount) FROM expenses")
+    total = cursor.fetchone()[0]
+    connection.close()
+    return total or 0
