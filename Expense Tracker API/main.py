@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from schemas import ExpanseCreate, ExpenseUpdate
-from crud import create_table, add_expense, get_all_expenses, expense_to_dicts, expense_to_dict, get_expense_by_id, update_expense, delete_expense, get_total_expenses
+from crud import create_table, add_expense, get_all_expenses, expense_to_dicts, expense_to_dict, get_expense_by_id, update_expense, delete_expense, get_total_expenses, get_expenses_by_category
 
 
 app = FastAPI()
@@ -57,6 +57,13 @@ def get_expenses():
 def get_total_expenses_endpoint():
     total = get_total_expenses()
     return {"total_expenses": total}
+
+
+@app.get("/expenses/category/{category}")
+def get_expenses_category(category: str):
+    expenses = get_expenses_by_category(category)
+
+    return expense_to_dicts(expenses)
 
 
 @app.get("/expenses/{expense_id}")

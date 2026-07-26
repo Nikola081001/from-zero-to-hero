@@ -101,3 +101,16 @@ def get_total_expenses():
     total = cursor.fetchone()[0]
     connection.close()
     return total or 0
+
+
+def get_expenses_by_category(category):
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM expenses WHERE category = ?", (category,))
+
+    expenses = cursor.fetchall()
+
+    connection.close()
+
+    return expenses
