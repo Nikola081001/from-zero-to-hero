@@ -127,3 +127,17 @@ def get_expenses_by_payment_method(payment_method):
     connection.close()
 
     return expenses
+
+
+def get_total_by_category(category):
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "SELECT SUM(amount) FROM expenses WHERE category = ?", (category,))
+
+    total = cursor.fetchone()[0]
+
+    connection.close()
+
+    return total or 0
