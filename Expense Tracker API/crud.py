@@ -114,3 +114,16 @@ def get_expenses_by_category(category):
     connection.close()
 
     return expenses
+
+
+def get_expenses_by_payment_method(payment_method):
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    cursor.execute(
+        "SELECT * FROM expenses WHERE payment_method = ?", (payment_method,))
+
+    expenses = cursor.fetchall()
+
+    connection.close()
+
+    return expenses
